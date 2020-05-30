@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['logged'])){
+   header('Location: login.php');
+	exit();
+    }  
+?>
+
 <!DOCTYPE HTML>
 <html lang="pl">
 
@@ -6,7 +16,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title> Edycja danych osobowych | TB twojbudzet.com</title>
+    <title> Zmiana hasła | TB twojbudzet.com</title>
     <meta name="description" content="Strona, na której możesz stworzyć swój domowy budżet" />
     <meta name="keywords" content="budżet, domowy, oszczędności, plany" />
     <meta name="author" content="Małgorzata Mickiewicz">
@@ -57,7 +67,7 @@
 
                     </li>
                     <li class="nav-item"> <a class="nav-link btn-active" href="#">Ustawienia</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Wyloguj się</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
                 </ul>
             </div>
 
@@ -73,69 +83,37 @@
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
 
                     <h1 class="h2 font-weight-bold bg-color my-4">
-                        Edycja danych osobowych
+                        Zmiana hasła
                     </h1>
 
                 </div>
 
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
 
-                    <!--Name change-->
+                    <!--Password change-->
                     <div class="col-lg-6 offset-lg-3 p-3">
 
-                        <button type="button" class="btn btn-settings" data-toggle="modal" data-target="#modal-name">
-                            Zmień imię
+                        <button type="button" class="btn btn-settings" data-toggle="modal"
+                            data-target="#modal-password">
+                            Zmiana hasła
                         </button>
 
                     </div>
 
-                    <div class="modal fade" id="modal-name" tabindex="-1" role="dialog" aria-labelledby="name"
+                    <div class="modal fade" id="modal-password" tabindex="-1" role="dialog" aria-labelledby="modal-password"
                         aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="name">Zmień imię</h5>
+                                    <h5 class="modal-title font-weight-bold" id="modal-new-password">Zmień hasło</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <h5>Podaj nowe imię</h5>
-                                    <input type="text" class="form-control mt-3" id="imie" placeholder="Imię"
-                                        aria-label="imie" aria-describedby="imie">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn btn-sub-settings font-weight-bold">Zapisz</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--Email change-->
-                    <div class="col-lg-6 offset-lg-3 p-3">
-
-                        <button type="button" class="btn btn-settings" data-toggle="modal" data-target="#modal-email">
-                            Zmień email
-                        </button>
-
-                    </div>
-
-                    <div class="modal fade" id="modal-email" tabindex="-1" role="dialog" aria-labelledby="modal-email"
-                        aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="modal-new-email">Zmień email</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <h5>Podaj nowy email</h5>
-                                    <input type="text" class="form-control mt-3" id="email" placeholder="Email"
-                                        aria-label="email" aria-describedby="email">
+                                    <h5>Podaj nowe hasło</h5>
+                                    <input type="text" class="form-control mt-3" id="haslo" placeholder="Hasło"
+                                        aria-label="haslo" aria-describedby="haslo">
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary font-weight-bold"

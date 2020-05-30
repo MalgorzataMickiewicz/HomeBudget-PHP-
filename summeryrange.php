@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['logged'])){
+   header('Location: login.php');
+	exit();
+    }  
+?>
+
 <!DOCTYPE HTML>
 <html lang="pl">
 
@@ -59,7 +69,7 @@
 
                     </li>
                     <li class="nav-item"> <a class="nav-link" href="#">Ustawienia</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Wyloguj się</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
                 </ul>
             </div>
 
@@ -73,24 +83,43 @@
             <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
 
                 <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
-                    <p class=" h2 col-8 font-weight-bold bg-color my-4 d-inline-block">
+        
+                    <p class="h2 col-8 font-weight-bold bg-color my-4 d-inline-block">
                         Przeglądaj swój bilans
                     </p>
                     <div class="d-inline-block">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="list"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Poprzedni miesiąc
+                                Niestandardowy
                             </button>
                             <div class="dropdown-menu" aria-labelledby="list">
                                 <a class="dropdown-item" href="#">Bieżący miesiąc</a>
+                                <a class="dropdown-item" href="#">Poprzedni miesiąc</a>
                                 <a class="dropdown-item" href="#">Bieżący rok</a>
-                                <a class="dropdown-item" href="#">Niestandardowy</a>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <p class="h4 col-8 font-weight-bold bg-color my-4 d-inline-block">
+                        Wybierz zakres
+                    </p>
+                    <div class="col-lg-12 col-md-12 input-group input-daterange d-inline-block mb-4">
 
+                        <div class="input-group-addon d-lg-inline-block mx-2">od</div>
+
+                        <input type="text" class="col-lg-12 col-md-12  form-control control d-lg-inline-block mx-2" value="2012-04-05">
+                        <div class="input-group-addon d-lg-inline-block mx-2">do</div>
+
+                        <input type="text" class="form-control control d-lg-inline-block mx-2" value="2012-04-19">
+
+                    </div>   
+                    <div>
+                        <a href="">
+                    <p>Pokaż</p>
+                    </a>
+                </div>
+              
+                </div>
                 <div class="col-lg-6">
                     <table class="table table-bordered">
                         <thead class="bg-table">
@@ -336,6 +365,7 @@
                 <p class="h4 col-12 mb-4">Gratulacje! Nie przekroczyłeś swojego budżetu</p>
 
             </div>
+
         </div>
 
     </main>

@@ -1,3 +1,14 @@
+<?php
+
+session_start();
+    
+if ((isset($_SESSION['logged'])) && ($_SESSION['logged'] == true)){
+    header('Location: menu.php');
+    exit();
+}
+
+?>
+
 <!DOCTYPE HTML>
 <html lang="pl">
 <head>
@@ -56,8 +67,8 @@
 
                         </div>
 
-                        <input type="text" class="form-control" placeholder="*Imię" id="imie" aria-label="imie"
-                        aria-describedby="imie">
+                        <input type="text" class="form-control" placeholder="*Login" id="login" aria-label="login"
+                        aria-describedby="login">
 
                     </div>
                     
@@ -101,8 +112,9 @@
 
                 <div class="col-lg-4 bg-white my-4 offset-lg-2 offset-xs-0 shadow p-3">
                     <h1 class="h3 font-weight-bold my-4">Masz już konto? <br />Zaloguj się!</h1>
-
+                    <a href="login.php">
                         <button type="submit" class="btn-login my-3 mb-3">Logowanie </button>
+                    </a>
                     <p class="h4 font-weight-bold mb-2 mt-2">  </p>
 
                 </div>

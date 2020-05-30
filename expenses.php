@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['logged'])){
+   header('Location: login.php');
+	exit();
+    }  
+?>
+
 <!DOCTYPE HTML>
 <html lang="pl">
 
@@ -6,7 +16,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Dodawanie przychodu | TB twojbudzet.com</title>
+    <title>Dodawanie wydatku | TB twojbudzet.com</title>
     <meta name="description" content="Strona, na której możesz stworzyć swój domowy budżet" />
     <meta name="keywords" content="budżet, domowy, oszczędności, plany" />
     <meta name="author" content="Małgorzata Mickiewicz">
@@ -37,8 +47,8 @@
 
             <div class="collapse navbar-collapse" id="main-menu">
                 <ul class="navbar-nav my-auto">
-                    <li class="nav-item"> <a class="nav-link btn-active" href="#"> Dodaj przychód</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#"> Dodaj wydatek</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="#"> Dodaj przychód</a></li>
+                    <li class="nav-item"> <a class="nav-link btn-active" href="#"> Dodaj wydatek</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button"
                             aria-expanded="false" id="submenu" aria-haspopup="true"> Przeglądaj bilans </a>
@@ -57,7 +67,7 @@
 
                     </li>
                     <li class="nav-item"> <a class="nav-link" href="#">Ustawienia</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Wyloguj się</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
                 </ul>
             </div>
 
@@ -73,60 +83,74 @@
                 <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
 
                     <h1 class="h2 font-weight-bold bg-color my-4">
-                        Dodaj swój przychód
+                        Dodaj swój wydatek
                     </h1>
 
                 </div>
 
-                    <div class="col-lg-5 offset-lg-1">
+                <div class="col-lg-5 offset-lg-1">
 
-                        <label class="font-weight-bold" for="kwota">Dodaj kwotę przychodu</label>
+                    <label class="font-weight-bold" for="kwota">Dodaj kwotę wydatku</label>
 
-                        <input type="text" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
-                            aria-describedby="kwota">
+                    <input type="text" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
+                    aria-describedby="kwota">
 
-                    </div>
+                </div>
 
-                    <div class="col-lg-5">
+                <div class="col-lg-5">
 
-                        <label class="font-weight-bold" for="data">Dodaj datę przychodu</label>
+                    <label class="font-weight-bold" for="data">Dodaj datę wydatku</label>
 
-                        <input type="date" class="form-control" id="data" aria-label="data" aria-describedby="data">
+                    <input type="date" class="form-control" id="data" aria-label="data"
+                    aria-describedby="data">
 
-                    </div>
+                </div>
 
                     <div class="form-group col-lg-5 offset-lg-1">
 
-                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego
-                            przychodu</label>
+                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego wydatku</label>
                         <select multiple class="form-control" id="przychod-kategoria">
-                            <option value="a">Wynagrodzenie</option>
-                            <option value="b">Odsetki bankowe</option>
-                            <option value="c">Sprzedaż allegro</option>
-                            <option value="d">Inne</option>
+                            <option value="a"> Jedzenie </option>
+                            <option value="b"> Mieszkanie </option>
+                            <option value="c"> Transport </option>
+                            <option value="d"> Telekomunikacja </option>
+                            <option value="e"> Opieka zdrowotna </option>
+                            <option value="f"> Ubranie </option>
+                            <option value="g"> Higiena </option>
+                            <option value="h"> Dzieci </option>
+                            <option value="i"> Rozrywka </option>
+                            <option value="j"> Wycieczka </option>
+                            <option value="k"> Szkolenia </option>
+                            <option value="l"> Książki </option>
+                            <option value="m"> Oszczędności </option>
+                            <option value="n"> Emerytura </option>
+                            <option value="o"> Zpłata długów </option>
+                            <option value="p"> Darowizna </option>
+                            <option value="r"> Inne </option>
+
                         </select>
 
-                    </div>
+                      </div>
 
-                    <div class="form-group col-lg-5">
+                      <div class="form-group col-lg-5">
 
                         <label class="font-weight-bold" for="komentarz"> Dodaj opcjonalnie swój komentarz </label>
                         <textarea class="form-control" id="komentarz" rows="3"></textarea>
 
-                    </div>
+                    </div>  
 
                     <div class="col-lg-5 offset-lg-1 p-1">
-                        <button type="submit" class="btn btn-register my-3"> Dodaj przychód </button>
+                        <button type="submit" class="btn btn-register my-3"> Dodaj wydatek </button>
                     </div>
-
+                    
                     <div class="col-lg-5 p-1">
                         <button type="submit" class="btn btn-register my-3"> Anuluj </button>
                     </div>
 
-                </div>
-
             </div>
+
         </div>
+
     </main>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
