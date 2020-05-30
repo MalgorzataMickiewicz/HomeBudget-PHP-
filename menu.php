@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['logged'])){
+   header('Location: login.php');
+	exit();
+    }  
+?>
+
 <!DOCTYPE HTML>
 <html lang="pl">
 <head>
@@ -54,7 +64,8 @@
 						
 					</li>
 					<li class="nav-item"> <a class="nav-link" href="#">Ustawienia</a></li>
-					<li class="nav-item"> <a class="nav-link" href="#">Wyloguj się</a></li>
+					<li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
+
 				</ul>
 			</div> 
 
@@ -69,9 +80,9 @@
 
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
 
-                    <h1 class="h2 font-weight-bold my-4">
-                        Poznaj siłę kontroli nad własnym budżetem
-                    </h1>
+                <?php
+                  	echo '<p class="h3 font-weight-bold my-4">Witaj '.$_SESSION['userName'].'! Poznaj siłę kontroli nad własnym budżetem </p>';
+                ?>
 
                     <h2 class="h3">
                         Planowanie swojego budżetu domowego oraz jego kontrola pozwala na wprowdzenie harmonii do życia. Dzięki chwili poświęconej na zaplanowanie budżetu na cały miesiąc, będziesz czuć kontrolę nie tylko w sferze finansów ale również w życiu codziennym.
