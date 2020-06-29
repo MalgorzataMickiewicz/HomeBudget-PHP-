@@ -78,10 +78,11 @@ if(isset($_POST['email'])){
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         
         if($validation_OK == true){
-            //Testy zaliczone, dodajemy gracza do bazy
+            //Testy zaliczone, dodajemy użytkownika do bazy
                            
             if ($connection->query("INSERT INTO clients VALUES (NULL, '$login', '$email', '$password_hash')")){
                 $_SESSION['registration'] = true;
+                $_SESSION['c_registration'] = "Użytkownik został prawidłowo zarejestrowany";
                // header('Location: hello.php');
             }
             else{
@@ -167,21 +168,21 @@ if(isset($_POST['email'])){
                     
                         <div class="col-10 offset-md-1 input-group mb-4">
 
-                        <div class="input-group-prepend">
-                            <span class="input-group-text register-color"> ✉ </span>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text register-color"> ✉ </span>
 
-                        </div>
+                            </div>
 
-                        <input type="text" name="email" class="form-control" placeholder="*Email" id="email" aria-label="email"
-                        aria-describedby="email">
+                            <input type="text" name="email" class="form-control" placeholder="*Email" id="email" aria-label="email"
+                            aria-describedby="email">
 
-                        <?php
+                            <?php
 
-                            if(isset($_SESSION['e_email'])) {
-                                echo '<div style="color: red;">'.$_SESSION['e_email'].'</div>';
-                                unset($_SESSION['e_email']);
-                            }
-                        ?>
+                                if(isset($_SESSION['e_email'])) {
+                                    echo '<div style="color: red;">'.$_SESSION['e_email'].'</div>';
+                                    unset($_SESSION['e_email']);
+                                }
+                            ?>
 
                         </div>
 
@@ -216,6 +217,13 @@ if(isset($_POST['email'])){
                         <button type="submit" class="btn btn-register my-3 mb-3">Zarejestruj się</button>
                     
                         <p>*Pole wymagane</p>
+                            <?php
+
+                            if(isset($_SESSION['c_registration'])) {
+                                echo '<div>'.$_SESSION['c_registration'].'</div>';
+                                unset($_SESSION['c_registration']);
+                            }
+                            ?>         
                     </form>
 
                 </div>
