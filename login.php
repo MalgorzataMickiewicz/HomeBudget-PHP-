@@ -7,7 +7,7 @@ if ((isset($_SESSION['logged'])) && ($_SESSION['logged'] == true)){
     exit();
 }
 
-if(isset($_POST['email'])){
+if(isset($_POST['login'])){
 	//Flagg
     $validation_OK = true;
 
@@ -19,58 +19,33 @@ if(isset($_POST['email'])){
 		echo "Error: ".$connection->connect_errno;
 	}
     else{
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-        
-            $email = htmlentities($email, ENT_QUOTES, "UTF-8");
-            $password = htmlentities($password, ENT_QUOTES, "UTF-8");
-        
-            if ($result = @$connection->query(
-                sprintf("SELECT * FROM clients WHERE userEmail='%s' AND userPassword='%s'",
-                mysqli_real_escape_string($connection,$email),
-                mysqli_real_escape_string($connection,$password)))){
-            
-                $sql = "SELECT * FROM clients WHERE userEmail='$email' AND userPassword='$password'";
-            }
+        $login = $_POST['login'];
+        $password = $_POST['password'];
+                
+        if ($result = @$connection->query(
+            sprintf("SELECT * FROM clients WHERE userLogin='%s'",
+            mysqli_real_escape_string($connection,$login)))){
 
-            if($result = @$connection->query($sql)){
-				$user_number = $result->num_rows;
-				if($user_number>0){
-                    $line = $result->fetch_assoc();
-                    $_SESSION['userName'] = $line['userName'];
+            $user_number = $result->num_rows;
 
+            if($user_number > 0){
+                $line = $result->fetch_assoc();
+
+                if(password_verify($password,$line['userPassword'])){
+                    $_SESSION['userLogin'] = $wiersz['userLogin'];
                     $_SESSION['logged'] = true;
+                    unset($_SESSION['e_error']);
                     header('Location: menu.php');
                 }
-                
-			    else if($result = @$connection->query(
-                    sprintf("SELECT * FROM clients WHERE userLogin='%s' AND userPassword='%s'",
-                    mysqli_real_escape_string($connection,$email),
-                    mysqli_real_escape_string($connection,$password)))){
-
-                    $sql = "SELECT * FROM clients WHERE userLogin='$email' AND userPassword='$password'";
-
-                    if($result = @$connection->query($sql)){
-                        $user_number = $result->num_rows;
-                        if($user_number>0){
-        
-                            $line = $result->fetch_assoc();
-                            $_SESSION['userName'] = $line['userName'];
-        
-                            $_SESSION['logged'] = true;
-                            header('Location: menu.php');
-                        }
-                        else{
-                            $_SESSION['error'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
-                        }
-                    }
-                }
-
                 else{
-                    $_SESSION['error'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
+                    $_SESSION['e_error'] = '<span style="color:red">Nieprawidłowy login lub hasło!</span>';
                 }
             }
-        $connection->close();
+            else{
+                $_SESSION['e_error'] = '<span style="color:red">2Nieprawidłowy login lub hasło!</span>';
+            }
+        }
+        $connection->close();     
     }
 }
 ?>
@@ -127,8 +102,8 @@ if(isset($_POST['email'])){
 
                             </div>
 
-                            <input type="text" name="email" class="form-control" placeholder="*E-mail lub Login"
-                                id="email" aria-label="email" aria-describedby="email">
+                            <input type="text" name="login" class="form-control" placeholder="*Login"
+                                id="login" aria-label="login" aria-describedby="login">
                         </div>
 
                         <div class="col-10 offset-md-1 input-group mb-4">
@@ -157,11 +132,13 @@ if(isset($_POST['email'])){
                     </form>
 
                     <?php
-                        if(isset($_SESSION['error']))	echo $_SESSION['error'];
-                          unset($_SESSION['error']);
+                        if(isset($_SESSION['e_error'])) {
+                            echo '<div style="color: red;">'.$_SESSION['e_error'].'</div>';
+                            unset($_SESSION['e_error']);
+                        }
                     ?>
 
-                </div>
+                </div>s
 
                 <div class="col-lg-4 offset-lg-2 offset-xs-0 bg-white my-4 shadow p-3">
                     <h1 class="h3 font-weight-bold my-4">Nie masz jeszcze konta? <br />Zarejestruj się!</h1>
