@@ -37,7 +37,7 @@ if (!isset($_SESSION['logged'])){
     <header>
 
         <nav class="navbar bg-budget navbar-dark navbar-expand-lg text-center">
-            <a class="navbar-brand logo ml-2" href="#">Your Budget</a>
+            <a class="navbar-brand logo ml-2" href="menu.php">Your Budget</a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu" aria-controls="main-menu" aria-expanded="false" aria-label="Przełącznik nawigacji">
                 <span class="navbar-toggler-icon"></span>
@@ -45,25 +45,25 @@ if (!isset($_SESSION['logged'])){
      
 			<div class="collapse navbar-collapse" id="main-menu">
 				<ul class="navbar-nav my-auto">
-                    <li class="nav-item"> <a class="nav-link" href="#"> Dodaj przychód</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#"> Dodaj wydatek</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="incomes.php"> Dodaj przychód</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="expenses.php"> Dodaj wydatek</a></li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false" id="submenu" aria-haspopup="true"> Przeglądaj bilans </a>
+						<a class="nav-link dropdown-toggle" href="" data-toggle="dropdown" role="button" aria-expanded="false" id="submenu" aria-haspopup="true"> Przeglądaj bilans </a>
 						
 						<div class="dropdown-menu" aria-labelledby="submenu">
 						
-							<a class="dropdown-item" href="#"> Bieżący miesiąc </a>
-							<a class="dropdown-item" href="#"> Poprzedni miesiąc </a>
+							<a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
+							<a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
 							
 							<div class="dropdown-divider"></div>
 							
-							<a class="dropdown-item" href="#"> Bieżący rok </a>
-							<a class="dropdown-item" href="#"> Niestandardowy </a>
+							<a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
+							<a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
 				
 						</div>
 						
 					</li>
-					<li class="nav-item"> <a class="nav-link" href="#">Ustawienia</a></li>
+					<li class="nav-item"> <a class="nav-link" href="settings.php">Ustawienia</a></li>
 					<li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
 
 				</ul>
@@ -81,7 +81,7 @@ if (!isset($_SESSION['logged'])){
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
 
                 <?php
-                  	echo '<p class="h3 font-weight-bold my-4">Witaj '.$_SESSION['userName'].'! Poznaj siłę kontroli nad własnym budżetem </p>';
+                  	echo '<p class="h3 font-weight-bold my-4">Witaj '.$_SESSION['userLogin'].'! Poznaj siłę kontroli nad własnym budżetem </p>';
                 ?>
 
                     <h2 class="h3">

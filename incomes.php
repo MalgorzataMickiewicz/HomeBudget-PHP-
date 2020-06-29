@@ -38,7 +38,7 @@ if (!isset($_SESSION['logged'])){
     <header>
 
         <nav class="navbar bg-budget navbar-dark navbar-expand-lg text-center">
-            <a class="navbar-brand logo ml-2" href="#">Your Budget</a>
+            <a class="navbar-brand logo ml-2" href="menu.php">Your Budget</a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu"
                 aria-controls="main-menu" aria-expanded="false" aria-label="Przełącznik nawigacji">
@@ -47,26 +47,26 @@ if (!isset($_SESSION['logged'])){
 
             <div class="collapse navbar-collapse" id="main-menu">
                 <ul class="navbar-nav my-auto">
-                    <li class="nav-item"> <a class="nav-link btn-active" href="#"> Dodaj przychód</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="#"> Dodaj wydatek</a></li>
+                    <li class="nav-item"> <a class="nav-link btn-active" href="incomes.php"> Dodaj przychód</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="expenses.php"> Dodaj wydatek</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="" data-toggle="dropdown" role="button"
                             aria-expanded="false" id="submenu" aria-haspopup="true"> Przeglądaj bilans </a>
 
                         <div class="dropdown-menu" aria-labelledby="submenu">
 
-                            <a class="dropdown-item" href="#"> Bieżący miesiąc </a>
-                            <a class="dropdown-item" href="#"> Poprzedni miesiąc </a>
-
-                            <div class="dropdown-divider"></div>
-
-                            <a class="dropdown-item" href="#"> Bieżący rok </a>
-                            <a class="dropdown-item" href="#"> Niestandardowy </a>
+                            <a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
+							<a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
+							
+							<div class="dropdown-divider"></div>
+							
+							<a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
+							<a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
 
                         </div>
 
                     </li>
-                    <li class="nav-item"> <a class="nav-link" href="#">Ustawienia</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="settings.php">Ustawienia</a></li>
                     <li class="nav-item"> <a class="nav-link" href="logout.php">Wyloguj się</a></li>
                 </ul>
             </div>
@@ -130,7 +130,9 @@ if (!isset($_SESSION['logged'])){
                     </div>
 
                     <div class="col-lg-5 p-1">
+                        <a href="menu.php">
                         <button type="submit" class="btn btn-register my-3"> Anuluj </button>
+                        </a>
                     </div>
 
                 </div>
