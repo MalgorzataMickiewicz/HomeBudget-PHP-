@@ -32,7 +32,8 @@ if(isset($_POST['login'])){
                 $line = $result->fetch_assoc();
 
                 if(password_verify($password,$line['userPassword'])){
-                    $_SESSION['userLogin'] = $wiersz['userLogin'];
+                    $_SESSION['userLogin'] = $line['userLogin'];
+                    $_SESSION['userId'] = $line['userId'];
                     $_SESSION['logged'] = true;
                     unset($_SESSION['e_error']);
                     header('Location: menu.php');
@@ -92,8 +93,9 @@ if(isset($_POST['login'])){
             <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
 
                 <div class="col-lg-4 offset-lg-1 bg-white my-4 shadow p-3">
+
+                    <h1 class="h3 font-weight-bold my-4">Logowanie</h1>
                     <form method="post">
-                        <h1 class="h3 font-weight-bold my-4">Logowanie</h1>
 
                         <div class="col-10 offset-md-1 input-group mb-4">
 
@@ -102,8 +104,8 @@ if(isset($_POST['login'])){
 
                             </div>
 
-                            <input type="text" name="login" class="form-control" placeholder="*Login"
-                                id="login" aria-label="login" aria-describedby="login">
+                            <input type="text" name="login" class="form-control" placeholder="*Login" id="login"
+                                aria-label="login" aria-describedby="login">
                         </div>
 
                         <div class="col-10 offset-md-1 input-group mb-4">
@@ -138,7 +140,7 @@ if(isset($_POST['login'])){
                         }
                     ?>
 
-                </div>s
+                </div>
 
                 <div class="col-lg-4 offset-lg-2 offset-xs-0 bg-white my-4 shadow p-3">
                     <h1 class="h3 font-weight-bold my-4">Nie masz jeszcze konta? <br />Zarejestruj się!</h1>

@@ -6,6 +6,39 @@ if (!isset($_SESSION['logged'])){
    header('Location: login.php');
 	exit();
     }  
+    
+if(isset($_POST['kwota'])){
+	//Flaga
+    $validation_OK = true;
+    
+    require_once "connect.php"; 
+
+	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+	if($connection->connect_errno!=0){
+		echo "Error: ".$connection->connect_errno;
+    }
+    else{
+
+        $kwota = $_POST['kwota'];
+        $data = $_POST['data'];
+        $kategoria = $_POST['kategoria'];
+        $komentarz = $_POST['komentarz'];
+        $userId = $_SESSION['userId'];
+
+        if($validation_OK == true){
+            //Testy zaliczone, dodajemy przychód do bazy
+                           
+            if ($connection->query("INSERT INTO incomes VALUES ('$userId', NULL, '$data', '$kwota', '$kategoria', '$komentarz')")){
+                $_SESSION['c_communicat'] = "Przychód został prawidłowo dodany";
+            }
+            else{
+                    throw new Exception($polaczenie->error);        
+            }
+            $connection->close();
+        }
+    }
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -56,12 +89,12 @@ if (!isset($_SESSION['logged'])){
                         <div class="dropdown-menu" aria-labelledby="submenu">
 
                             <a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
-							<a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
-							
-							<div class="dropdown-divider"></div>
-							
-							<a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
-							<a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
+                            <a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
+                            <a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
 
                         </div>
 
@@ -78,21 +111,31 @@ if (!isset($_SESSION['logged'])){
     <main>
         <div class="container">
 
-            <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
+            <form method="post">
+                <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
 
-                <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
+                    <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
 
-                    <h1 class="h2 font-weight-bold bg-color my-4">
-                        Dodaj swój przychód
-                    </h1>
+                        <h1 class="h2 font-weight-bold bg-color my-4">
+                            Dodaj swój przychód
+                        </h1>
 
-                </div>
+                    </div>
+
+                    <?php
+                        if(isset($_SESSION['c_communicat'])) {
+                            echo '<div class="col-lg-10 offset-lg-1 my-2" style="color:#47A8BD; font-weight:bold;">'.$_SESSION['c_communicat'].'</div>';
+                            unset($_SESSION['c_communicat']);
+                        }
+                    ?>  
 
                     <div class="col-lg-5 offset-lg-1">
+                        
+               
 
                         <label class="font-weight-bold" for="kwota">Dodaj kwotę przychodu</label>
 
-                        <input type="text" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
+                        <input type="text" name="kwota" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
                             aria-describedby="kwota">
 
                     </div>
@@ -101,7 +144,7 @@ if (!isset($_SESSION['logged'])){
 
                         <label class="font-weight-bold" for="data">Dodaj datę przychodu</label>
 
-                        <input type="date" class="form-control" id="data" aria-label="data" aria-describedby="data">
+                        <input type="date" name="data" class="form-control" id="data" aria-label="data" aria-describedby="data">
 
                     </div>
 
@@ -109,7 +152,7 @@ if (!isset($_SESSION['logged'])){
 
                         <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego
                             przychodu</label>
-                        <select multiple class="form-control" id="przychod-kategoria">
+                        <select name="kategoria" multiple class="form-control" id="przychod-kategoria">
                             <option value="a">Wynagrodzenie</option>
                             <option value="b">Odsetki bankowe</option>
                             <option value="c">Sprzedaż allegro</option>
@@ -121,7 +164,7 @@ if (!isset($_SESSION['logged'])){
                     <div class="form-group col-lg-5">
 
                         <label class="font-weight-bold" for="komentarz"> Dodaj opcjonalnie swój komentarz </label>
-                        <textarea class="form-control" id="komentarz" rows="3"></textarea>
+                        <textarea name="komentarz" class="form-control" id="komentarz" rows="3"></textarea>
 
                     </div>
 
@@ -131,13 +174,11 @@ if (!isset($_SESSION['logged'])){
 
                     <div class="col-lg-5 p-1">
                         <a href="menu.php">
-                        <button type="submit" class="btn btn-register my-3"> Anuluj </button>
+                            <button type="submit" class="btn btn-register my-3"> Anuluj </button>
                         </a>
-                    </div>
-
+                    </div>  
                 </div>
-
-            </div>
+            </form>
         </div>
     </main>
 
