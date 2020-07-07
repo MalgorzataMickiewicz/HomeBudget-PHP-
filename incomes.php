@@ -19,24 +19,61 @@ if(isset($_POST['kwota'])){
 		echo "Error: ".$connection->connect_errno;
     }
     else{
-
         $kwota = $_POST['kwota'];
-        $data = $_POST['data'];
-        $kategoria = $_POST['kategoria'];
-        $komentarz = $_POST['komentarz'];
-        $userId = $_SESSION['userId'];
+
+        //walidacja kwoty
+        if($kwota != 0){
+            $kwota = str_replace(",",".",$kwota); 
+            $places = 2;
+            $mult = pow(10, $places);
+            $newKwota = ceil($kwota * $mult) / $mult;
+        }
+        else{
+            $_SESSION['e_kwota']="Wprowadź liczbę dodatnią, różną od zera!";
+            $validation_OK = false;
+        }
+
+        //walidacja kategorii
+        if(!isset($_POST['kategoria'])){
+
+            $_SESSION['e_kategoria']="Wybierz kategorię!";
+            $validation_OK = false;
+        }
 
         if($validation_OK == true){
             //Testy zaliczone, dodajemy przychód do bazy
-                           
-            if ($connection->query("INSERT INTO incomes VALUES ('$userId', NULL, '$data', '$kwota', '$kategoria', '$komentarz')")){
-                $_SESSION['c_communicat'] = "Przychód został prawidłowo dodany";
+
+            if ($connection){
+
+                $kategoria = $_POST['kategoria'];
+                $data = $_POST['data'];
+                $komentarz = $_POST['komentarz'];
+                $userId = $_SESSION['userId'];
+
+                $result = mysqli_query($connection, "SELECT * FROM incomescategory WHERE categoryName = '$kategoria'");
+                while ($row = $result->fetch_assoc()) {
+
+                    $categoryName = $row['categoryName'];
+
+                    mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$categoryName')");
+
+                    $resultId = mysqli_query($connection, "SELECT * FROM incomescategoryassigned ORDER BY id DESC LIMIT 1");
+                    while ($row = $resultId->fetch_assoc()) {
+
+                        $categoryId= $row['id'];
+
+                        mysqli_query($connection, "INSERT INTO incomes VALUES ('$userId', NULL, '$data', '$newKwota', '$categoryId', '$komentarz')");
+                    }
+                    
+                    
+                    $_SESSION['c_communicat'] = "Przychód został prawidłowo dodany";
+                } 
             }
             else{
-                    throw new Exception($polaczenie->error);        
+                throw new Exception($connection->error);        
             }
-            $connection->close();
         }
+        $connection->close();
     }
 }
 ?>
@@ -137,9 +174,15 @@ if(isset($_POST['kwota'])){
 
                         <input type="text" name="kwota" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
                             aria-describedby="kwota">
+                            <?php
 
+                                if(isset($_SESSION['e_kwota'])) {
+                                    echo '<div style="color: red;">'.$_SESSION['e_kwota'].'</div>';
+                                    unset($_SESSION['e_kwota']);
+                                }
+                            ?>
                     </div>
-
+                   
                     <div class="col-lg-5">
 
                         <label class="font-weight-bold" for="data">Dodaj datę przychodu</label>
@@ -150,15 +193,21 @@ if(isset($_POST['kwota'])){
 
                     <div class="form-group col-lg-5 offset-lg-1">
 
-                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego
+                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorię dodawanego
                             przychodu</label>
                         <select name="kategoria" multiple class="form-control" id="przychod-kategoria">
-                            <option value="a">Wynagrodzenie</option>
-                            <option value="b">Odsetki bankowe</option>
-                            <option value="c">Sprzedaż allegro</option>
-                            <option value="d">Inne</option>
+                            <option value="Wynagrodzenie">Wynagrodzenie</option>
+                            <option value="Odsetki bankowe">Odsetki bankowe</option>
+                            <option value="Sprzedaż allegro">Sprzedaż allegro</option>
+                            <option value="Inne">Inne</option>
                         </select>
+                        <?php
 
+                        if(isset($_SESSION['e_kategoria'])) {
+                            echo '<div style="color: red;">'.$_SESSION['e_kategoria'].'</div>';
+                            unset($_SESSION['e_kategoria']);
+                        }
+                        ?>
                     </div>
 
                     <div class="form-group col-lg-5">
