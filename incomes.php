@@ -6,6 +6,35 @@ if (!isset($_SESSION['logged'])){
    header('Location: login.php');
 	exit();
     }  
+
+if (isset($_SESSION['logged'])){
+
+    require_once "connect.php"; 
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+    if($connection->connect_errno!=0){
+        echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        if ($connection){
+
+            $userId = $_SESSION['userId'];
+            $resultName = mysqli_query($connection, "SELECT categoryName FROM incomescategoryassigned WHERE userId = '$userId'");
+            $i = 0;
+            while ($row = $resultName->fetch_assoc()) {
+
+                $categoryName= $row['categoryName'];
+                $_SESSION['c_category'.$i] = '<option value="'.$categoryName.'">'.$categoryName.'</option>';
+                $i += 1;          
+            }
+            $_SESSION['c_cat'] = '';
+        }
+        else{
+             throw new Exception($connection->error);        
+        }
+  }
+$connection->close();
+}  
     
 if(isset($_POST['kwota'])){
 	//Flaga
@@ -50,24 +79,15 @@ if(isset($_POST['kwota'])){
                 $komentarz = $_POST['komentarz'];
                 $userId = $_SESSION['userId'];
 
-                $result = mysqli_query($connection, "SELECT * FROM incomescategory WHERE categoryName = '$kategoria'");
-                while ($row = $result->fetch_assoc()) {
-
-                    $categoryName = $row['categoryName'];
-
-                    mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$categoryName')");
-
-                    $resultId = mysqli_query($connection, "SELECT * FROM incomescategoryassigned ORDER BY id DESC LIMIT 1");
-                    while ($row = $resultId->fetch_assoc()) {
-
-                        $categoryId= $row['id'];
-
-                        mysqli_query($connection, "INSERT INTO incomes VALUES ('$userId', NULL, '$data', '$newKwota', '$categoryId', '$komentarz')");
-                    }
+                $resultId = mysqli_query($connection, "SELECT * FROM incomescategoryassigned WHERE categoryName = '$kategoria'");
+            
+                while ($row = $resultId->fetch_assoc()) {
+                    $categoryId= $row['id'];
                     
+                   mysqli_query($connection, "INSERT INTO incomes VALUES ('$userId', NULL, '$data', '$newKwota', '$categoryId', '$komentarz')");
+                }
                     
-                    $_SESSION['c_communicat'] = "Przychód został prawidłowo dodany";
-                } 
+                $_SESSION['c_communicat'] = "Przychód został prawidłowo dodany";
             }
             else{
                 throw new Exception($connection->error);        
@@ -195,14 +215,23 @@ if(isset($_POST['kwota'])){
 
                         <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorię dodawanego
                             przychodu</label>
+                        
                         <select name="kategoria" multiple class="form-control" id="przychod-kategoria">
-                            <option value="Wynagrodzenie">Wynagrodzenie</option>
-                            <option value="Odsetki bankowe">Odsetki bankowe</option>
-                            <option value="Sprzedaż allegro">Sprzedaż allegro</option>
-                            <option value="Inne">Inne</option>
+                           
+                            <?php
+                             if(isset($_SESSION['c_cat'])) {
+                                 
+                                 for ($j = 0; $j < $i; $j++) {
+                                     
+                                    echo $_SESSION['c_category'.$j];
+                                    unset($_SESSION['c_category'.$j]);
+                                 }
+                                 unset($_SESSION['c_cat']);
+                             }
+                            ?>
                         </select>
+                        
                         <?php
-
                         if(isset($_SESSION['e_kategoria'])) {
                             echo '<div style="color: red;">'.$_SESSION['e_kategoria'].'</div>';
                             unset($_SESSION['e_kategoria']);

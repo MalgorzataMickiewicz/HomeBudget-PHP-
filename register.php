@@ -79,14 +79,23 @@ if(isset($_POST['email'])){
         
         if($validation_OK == true){
             //Testy zaliczone, dodajemy użytkownika do bazy
-                           
+
             if ($connection->query("INSERT INTO clients VALUES (NULL, '$login', '$email', '$password_hash')")){
-                $_SESSION['registration'] = true;
-                $_SESSION['c_registration'] = "Użytkownik został prawidłowo zarejestrowany";
-               // header('Location: hello.php');
+               
+                $resultUser = mysqli_query($connection, "SELECT userId FROM clients ORDER BY userId DESC LIMIT 1");               
+                    while ($row = $resultUser->fetch_assoc()) {
+                        $userId= $row['userId'];
+                    }
+                $resultCategory = mysqli_query($connection, "SELECT categoryName FROM incomescategory");               
+                    while ($row = $resultCategory->fetch_assoc()) {
+                        $categoryName= $row['categoryName'];
+                        mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$categoryName')");
+                    }
+                    $_SESSION['registration'] = true;
+                    $_SESSION['c_registration'] = "Użytkownik został prawidłowo zarejestrowany";
             }
             else{
-					throw new Exception($polaczenie->error);
+					throw new Exception($connection->error);
             }
             $connection->close();
         }

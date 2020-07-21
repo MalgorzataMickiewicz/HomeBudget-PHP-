@@ -6,6 +6,46 @@ if (!isset($_SESSION['logged'])){
    header('Location: login.php');
 	exit();
     }  
+
+    if(isset($_POST['password'])){
+        //Flaga
+        $validation_OK = true;
+        
+        require_once "connect.php"; 
+    
+        $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    
+        if($connection->connect_errno!=0){
+            echo "Error: ".$connection->connect_errno;
+        }
+        else{
+             // Walidacja hasła
+        $password = $_POST['password'];
+
+        if(strlen($password) < 8 || strlen($password) > 20){
+            $validation_OK = false;
+            $_SESSION['e_password'] = "Hasło musi posiadać od 8 do 20 znaków";
+        }
+
+        
+        //hashowanie haseł
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        
+        if($validation_OK == true){
+            //Testy zaliczone, dokonujemy update-tu
+            $userId = $_SESSION['userId'];
+            "SELECT userEmail FROM clients WHERE userID='$userId'";
+
+            if ($connection->query("UPDATE clients SET userPassword = '$password_hash' WHERE userId = '$userId'")){
+                $_SESSION['c_password'] = "Hasło zostało prawidłowo zmienione!";
+            }
+            else{
+					throw new Exception($connection->error);
+            }
+            $connection->close();
+        }
+        }
+    }
 ?>
 
 <!DOCTYPE HTML>
@@ -90,6 +130,16 @@ if (!isset($_SESSION['logged'])){
 
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
 
+                <?php
+                    if(isset($_SESSION['c_password'])) {
+                        echo '<div style="color: #47A8BD; font-weight: bold;">'.$_SESSION['c_password'].'</div>';
+                        unset($_SESSION['c_password']);
+                    }
+                    if(isset($_SESSION['e_password'])) {
+                        echo '<div style="color: red;">'.$_SESSION['e_password'].'</div>';
+                        unset($_SESSION['e_password']);
+                    }
+                ?>
                     <!--Password change-->
                     <div class="col-lg-6 offset-lg-3 p-3">
 
@@ -110,16 +160,18 @@ if (!isset($_SESSION['logged'])){
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
-                                    <h5>Podaj nowe hasło</h5>
-                                    <input type="text" class="form-control mt-3" id="haslo" placeholder="Hasło"
-                                        aria-label="haslo" aria-describedby="haslo">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn btn-sub-settings font-weight-bold">Zapisz</button>
-                                </div>
+                                <form method="post">
+                                    <div class="modal-body">
+                                        <h5>Podaj nowe hasło</h5>
+                                        <input type="text" name="password" class="form-control mt-3" id="haslo" placeholder="Hasło"
+                                            aria-label="haslo" aria-describedby="haslo">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary font-weight-bold"
+                                            data-dismiss="modal">Anuluj</button>
+                                        <button type="submit" class="btn btn-sub-settings font-weight-bold">Zapisz</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
