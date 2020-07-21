@@ -4,8 +4,103 @@ session_start();
 
 if (!isset($_SESSION['logged'])){
    header('Location: login.php');
-	exit();
+    exit();
     }  
+    
+if(isset($_POST['email'])){
+	//Flaga
+    $validation_OK = true;
+    
+    require_once "connect.php"; 
+
+	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+	if($connection->connect_errno!=0){
+		echo "Error: ".$connection->connect_errno;
+    }
+    else{
+          // Walidacja emaila
+          $email = $_POST['email'];
+          $emailB = filter_var($email,FILTER_SANITIZE_EMAIL);
+  
+          if((filter_var($emailB,FILTER_VALIDATE_EMAIL) == false)){
+              $validation_OK = false;
+              $_SESSION['e_email'] = "Podaj poprawny adres email";
+          }
+
+		//Czy email już istnieje?
+		$resultat = $connection->query("SELECT userId FROM clients WHERE userEmail='$email'");
+				
+		if (!$resultat) throw new Exception($connection->error);
+			
+			$user_number_email = $resultat->num_rows;
+			if($user_number_email > 0){
+				$validation_OK = false;
+				$_SESSION['e_email']="Istnieje już konto przypisane do tego adresu e-mail!";
+            }
+            else{
+                if($validation_OK == true){
+                    $userId = $_SESSION['userId'];
+                    "SELECT userEmail FROM clients WHERE userID='$userId'";
+
+                    if ($connection->query("UPDATE clients SET userEmail = '$email' WHERE userId = '$userId'")){
+                        $_SESSION['c_change'] = "Email został prawidłowo zmieniony!";
+                    }
+                    else{
+                            throw new Exception($connection->error);
+                    }
+                    $connection->close();
+                }
+            }		    
+        }
+    }
+
+if(isset($_POST['login'])){
+
+    $validation_OK = true;
+    
+    require_once "connect.php"; 
+
+	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+	if($connection->connect_errno!=0){
+		echo "Error: ".$connection->connect_errno;
+    }
+    else{
+
+    $login = $_POST['login'];
+
+     //Czy nick jest już zarezerwowany?
+     $resultat = $connection->query("SELECT userID FROM clients WHERE userLogin='$login'");
+                
+     if (!$resultat) throw new Exception($connection->error);
+         
+     $user_number_login = $resultat->num_rows;
+         if($user_number_login > 0){
+             $validation_OK = false;
+             $_SESSION['e_login']="Istnieje już gracz o takim loginie! Wybierz inny.";
+         }
+         
+     if ((strlen($login) < 3) || (strlen($login) > 20)){
+         $validation_OK = false;
+         $_SESSION['e_login'] = "Login musi posiadać od 3 do 20 znaków!";
+     }
+     else{
+         if($validation_OK == true){
+             $userId = $_SESSION['userId'];
+             "SELECT userLogin FROM clients WHERE userID='$userId'";
+
+             if ($connection->query("UPDATE clients SET userLogin = '$login' WHERE userId = '$userId'")){
+                 $_SESSION['c_change'] = "Login został prawidłowo zmieniony!";
+             }
+             else{
+                     throw new Exception($connection->error);
+             }
+             $connection->close();
+         }
+    }
+}
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -55,13 +150,13 @@ if (!isset($_SESSION['logged'])){
 
                         <div class="dropdown-menu" aria-labelledby="submenu">
 
-                          <a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
-							<a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
-							
-							<div class="dropdown-divider"></div>
-							
-							<a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
-							<a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
+                            <a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
+                            <a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
+                            <a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
 
                         </div>
 
@@ -89,6 +184,20 @@ if (!isset($_SESSION['logged'])){
                 </div>
 
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
+                    <?php
+                        if(isset($_SESSION['c_change'])) {
+                            echo '<div style="color: #47A8BD; font-weight: bold;">'.$_SESSION['c_change'].'</div>';
+                            unset($_SESSION['c_change']);
+                        }
+                        if(isset($_SESSION['e_email'])) {
+                            echo '<div style="color: red;">'.$_SESSION['e_email'].'</div>';
+                            unset($_SESSION['e_email']);
+                        }
+                        if(isset($_SESSION['e_login'])) {
+                            echo '<div style="color: red;">'.$_SESSION['e_login'].'</div>';
+                            unset($_SESSION['e_login']);
+                        }
+                    ?>
 
                     <!--Name change-->
                     <div class="col-lg-6 offset-lg-3 p-3">
@@ -104,21 +213,26 @@ if (!isset($_SESSION['logged'])){
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="name">Zmień imię</h5>
+                                    <h5 class="modal-title font-weight-bold" id="name">Zmień login</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
-                                    <h5>Podaj nowe imię</h5>
-                                    <input type="text" class="form-control mt-3" id="imie" placeholder="Imię"
-                                        aria-label="imie" aria-describedby="imie">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn btn-sub-settings font-weight-bold">Zapisz</button>
-                                </div>
+                                <form method="post">
+                                    <div class="modal-body">
+                                        <h5>Podaj nowy login</h5>
+
+                                        <input type="text" name="login" class="form-control mt-3" id="login"
+                                            placeholder="login" aria-label="login" aria-describedby="login">
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary font-weight-bold"
+                                            data-dismiss="modal">Anuluj</button>
+                                        <button type="submit"
+                                            class="btn btn-sub-settings font-weight-bold">Zapisz</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -142,26 +256,30 @@ if (!isset($_SESSION['logged'])){
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
-                                    <h5>Podaj nowy email</h5>
-                                    <input type="text" class="form-control mt-3" id="email" placeholder="Email"
-                                        aria-label="email" aria-describedby="email">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn btn-sub-settings font-weight-bold">Zapisz</button>
-                                </div>
+                                <form method="post">
+                                    <div class="modal-body">
+                                        <h5>Podaj nowy email</h5>
+                                        <input type="text" name="email" class="form-control mt-3" id="email"
+                                            placeholder="Email" aria-label="email" aria-describedby="email">
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary font-weight-bold"
+                                            data-dismiss="modal">Anuluj</button>
+                                        <button type="submit"
+                                            class="btn btn-sub-settings font-weight-bold">Zapisz</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
 
-                      <!--Go back-->
-                      <div class="col-lg-6 offset-lg-3 p-3">
-                        <a href="settings.php"> 
-                        <button type="button" class="btn btn-settings">
-                            Powrót
-                        </button>
+                    <!--Go back-->
+                    <div class="col-lg-6 offset-lg-3 p-3">
+                        <a href="settings.php">
+                            <button type="button" class="btn btn-settings">
+                                Powrót
+                            </button>
                         </a>
 
                     </div>

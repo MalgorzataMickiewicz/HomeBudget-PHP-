@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 session_start();
 
@@ -6,7 +6,84 @@ if (!isset($_SESSION['logged'])){
    header('Location: login.php');
 	exit();
     }  
+
+
+if (isset($_SESSION['logged'])){
+
+    require_once "connect.php"; 
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+    if($connection->connect_errno!=0){
+        echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        if ($connection){
+
+            $userId = $_SESSION['userId'];
+            $resultName = mysqli_query($connection, "SELECT categoryName FROM incomescategoryassigned WHERE userId = '$userId'");
+            $i = 0;
+            while ($row = $resultName->fetch_assoc()) {
+
+                $categoryName= $row['categoryName'];
+                
+                $_SESSION['c_category'.$i] = '<option value="'.$categoryName.'">'.$categoryName.'</option>';
+                $_SESSION['c_categoryDelete'.$i] = '<h5 name="categoryDelete" class="d-inline-block col-6 my-3">'.$categoryName.'</h5> <button class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Usuń</button>'; 
+                $i += 1;          
+            }
+            
+            //$resultNameExp = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE userId = '$userId'");
+            //$j = 0;
+            //while ($row = $resultNameExp->fetch_assoc()) {
+
+              //  $categoryNameExp= $row['categoryName'];
+                
+                //$_SESSION['c_categoryExp'.$j] = '<option value="'.$categoryName.'">'.$categoryName.'</option>';
+                //$_SESSION['c_categoryDeleteExp'.$j] = '<h5 name="categoryDeleteExp" class="d-inline-block col-6 my-3">'.$categoryNameExp.'</h5> <button class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Usuń</button>'; 
+                //$j += 1;          
+            //}
+            
+            $_SESSION['c_cat'] = '';
+            $_SESSION['c_catDelete'] = '';
+            //$_SESSION['c_catDeleteExp'] = '';
+
+        }
+        else{
+             throw new Exception($connection->error);        
+        }
+  }
+$connection->close();
+}  
+
+if(isset($_POST['newCategory'])){
+    require_once "connect.php"; 
+
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+    if($connection->connect_errno!=0){
+        echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        $userId = $_SESSION['userId'];
+        $newCategory = $_POST['newCategory'];
+    
+        $resultat = $connection->query("SELECT categoryName FROM incomescategoryassigned WHERE categoryName='$newCategory'");
+				
+		if (!$resultat) throw new Exception($connection->error);
+			
+			$numberOfCategory = $resultat->num_rows;
+			if($numberOfCategory > 0){
+				$_SESSION['e_newCategory']="Istnieje już taka kategoria!";
+            }
+        else{
+             mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$newCategory')");
+             $_SESSION['c_newCategory']="Prawidłowo dodałeś nową kategorię!";
+        }
+    }
+    $connection->close(); 
+}
+
 ?>
+
 
 <!DOCTYPE HTML>
 <html lang="pl">
@@ -87,8 +164,21 @@ if (!isset($_SESSION['logged'])){
                     </h1>
 
                 </div>
+               
 
                 <div class="col-lg-10 offset-lg-1 my-4 bg-white shadow p-3">
+                       <?php
+                            if(isset($_SESSION['c_newCategory'])) {
+                                echo '<div style="color: #47A8BD;">'.$_SESSION['c_newCategory'].'</div>';
+                                unset($_SESSION['c_newCategory']);
+                            }
+                        ?>
+                       <?php
+                            if(isset($_SESSION['e_newCategory'])) {
+                                echo '<div style="color: red; font-weight: bold">'.$_SESSION['e_newCategory'].'</div>';
+                                unset($_SESSION['e_newCategory']);
+                            }
+                        ?>
 
                     <div class="col-6 offset-3 border mt-3"></div>
 
@@ -101,7 +191,7 @@ if (!isset($_SESSION['logged'])){
 
                         <button type="button" class="btn btn-settings" data-toggle="modal"
                             data-target="#modal-incomes-category-list">
-                            Wyświetlej listę kategorii
+                            Wyświetl listę kategorii
                         </button>
 
                     </div>
@@ -118,6 +208,18 @@ if (!isset($_SESSION['logged'])){
                                     </button>
                                 </div>
                                 <div class="modal-body">
+                                     <?php
+                                     if(isset($_SESSION['c_cat'])) {
+
+                                         for ($j = 0; $j < $i; $j++) {
+
+                                            echo $_SESSION['c_category'.$j];
+                                            echo '<div class="col-6 offset-3 border my-2"></div>';
+                                            unset($_SESSION['c_category'.$j]);
+                                         }
+                                          unset($_SESSION['c_cat']);
+                                     }
+                                    ?>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary font-weight-bold"
@@ -126,6 +228,7 @@ if (!isset($_SESSION['logged'])){
                             </div>
                         </div>
                     </div>
+
 
 
                     <!--Incomes Add category-->
@@ -141,26 +244,25 @@ if (!isset($_SESSION['logged'])){
                     <div class="modal fade" id="modal-incomes-add-category" tabindex="-1" role="dialog"
                         aria-labelledby="modal-incomes-add-category" aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="incomes-add-cattegory">Dodawania
-                                        kategorii</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                            <form method="post">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title font-weight-bold" id="incomes-add-cattegory">Dodawanie
+                                            kategorii</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>                                     
+                                    <div class="modal-body">
+                                        <input class="d-inline-block form-control mt-3" type="text" name="newCategory" id="incomes-add-new-category"
+                                            placeholder="Kategoria" aria-label="incomes-add-new-category"
+                                            aria-describedby="incomes-add-new-category">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Dodaj</button>
+                                    </div>
                                 </div>
-                                <div class="modal-body">
-                                    <input class="d-inline-block form-control mt-3" type="text" id="incomes-add-new-category"
-                                        placeholder="Kategoria" aria-label="incomes-add-new-category"
-                                        aria-describedby="incomes-add-new-category">
-                                    <button class="d-inline-block btn-sub-mini-setting ml-1">Dodaj</button>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn-sub-settings font-weight-bold">Zapisz</button>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
 
@@ -184,20 +286,26 @@ if (!isset($_SESSION['logged'])){
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="border my-1">
-                                        <h5 class="d-inline-block col-6 my-2">Pensja</h5> <button class="d-inline-block btn-sub-mini-setting my-2">Usuń</button>
-                                    </div> 
-                                    <div class="border my-1">
-                                    <h5 class="d-inline-block col-6 my-2">Pensja partnera</h5> <button class="d-inline-block 
-                                    btn-sub-mini-setting my-2">Usuń</button>
-                                </div> 
+                                <form method="post">
+                                    <div class="modal-body">
+                                        <div class="border my-1">
+                                                <?php
+                                                 if(isset($_SESSION['c_catDelete'])) {
 
-                                </div>
+                                                     for ($j = 0; $j < $i; $j++) {
+
+                                                        echo $_SESSION['c_categoryDelete'.$j];
+                                                        unset($_SESSION['c_categoryDelete'.$j]);
+                                                     }
+                                                     unset($_SESSION['c_catDelete']);
+                                                 }
+                                                ?>
+                                           
+                                        </div> 
+                                    </div>
+                                </form>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn-sub-settings font-weight-bold">Zapisz</button>
+                                    <button type="submit" class="btn-sub-settings font-weight-bold">Powrót</button>
                                 </div>
                             </div>
                         </div>
@@ -230,6 +338,22 @@ if (!isset($_SESSION['logged'])){
                                     </button>
                                 </div>
                                 <div class="modal-body">
+                                    
+                                     <div class="modal-body">
+                                    //<?php
+                                     //if(isset($_SESSION['c_cat'])) {
+
+                                       //  for ($j = 0; $j < $i; $j++) {
+
+                                         //   echo $_SESSION['c_category'.$j];
+                                           // echo '<div class="col-6 offset-3 border my-2"></div>';
+                                        //    unset($_SESSION['c_category'.$j]);
+                                        // }
+                                        //  unset($_SESSION['c_cat']);
+                                    // }
+                                    // ?>
+                                </div>
+                            
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary font-weight-bold"
@@ -346,5 +470,4 @@ if (!isset($_SESSION['logged'])){
 
 
 </body>
-
 </html>
