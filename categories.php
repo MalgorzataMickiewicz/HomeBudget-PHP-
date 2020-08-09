@@ -31,20 +31,21 @@ if (isset($_SESSION['logged'])){
                 $i += 1;          
             }
             
-            //$resultNameExp = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE userId = '$userId'");
-            //$j = 0;
-            //while ($row = $resultNameExp->fetch_assoc()) {
+            $resultNameExp = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE userId = '$userId'");
+            $j = 0;
+            while ($row = $resultNameExp->fetch_assoc()) {
 
-              //  $categoryNameExp= $row['categoryName'];
+                $categoryNameExp= $row['categoryName'];
                 
-                //$_SESSION['c_categoryExp'.$j] = '<option value="'.$categoryName.'">'.$categoryName.'</option>';
-                //$_SESSION['c_categoryDeleteExp'.$j] = '<h5 name="categoryDeleteExp" class="d-inline-block col-6 my-3">'.$categoryNameExp.'</h5> <button class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Usuń</button>'; 
-                //$j += 1;          
-            //}
+                $_SESSION['c_categoryExp'.$j] = '<option value="'.$categoryNameExp.'">'.$categoryNameExp.'</option>';
+                $_SESSION['c_categoryDeleteExp'.$j] = '<h5 name="categoryDeleteExp" class="d-inline-block col-6 my-3">'.$categoryNameExp.'</h5> <button class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Usuń</button>'; 
+                $j += 1;          
+            }
             
             $_SESSION['c_cat'] = '';
+            $_SESSION['c_catExp'] = '';
             $_SESSION['c_catDelete'] = '';
-            //$_SESSION['c_catDeleteExp'] = '';
+            $_SESSION['c_catDeleteExp'] = '';
 
         }
         else{
@@ -77,6 +78,34 @@ if(isset($_POST['newCategory'])){
         else{
              mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$newCategory')");
              $_SESSION['c_newCategory']="Prawidłowo dodałeś nową kategorię!";
+        }
+    }
+    $connection->close(); 
+}
+
+if(isset($_POST['newCategoryExp'])){
+    require_once "connect.php"; 
+
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+    if($connection->connect_errno!=0){
+        echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        $userId = $_SESSION['userId'];
+        $newCategoryExp = $_POST['newCategoryExp'];
+    
+        $resultat = $connection->query("SELECT categoryName FROM expensescategoryassigned WHERE categoryName='$newCategoryExp'");
+				
+		if (!$resultat) throw new Exception($connection->error);
+			
+			$numberOfCategory = $resultat->num_rows;
+			if($numberOfCategory > 0){
+				$_SESSION['e_newCategoryExp']="Istnieje już taka kategoria!";
+            }
+        else{
+             mysqli_query($connection, "INSERT INTO expensescategoryassigned VALUES (NULL, '$userId', '$newCategoryExp')");
+             $_SESSION['c_newCategoryExp']="Prawidłowo dodałeś nową kategorię!";
         }
     }
     $connection->close(); 
@@ -172,12 +201,19 @@ if(isset($_POST['newCategory'])){
                                 echo '<div style="color: #47A8BD;">'.$_SESSION['c_newCategory'].'</div>';
                                 unset($_SESSION['c_newCategory']);
                             }
-                        ?>
-                       <?php
+                            if(isset($_SESSION['c_newCategoryExp'])) {
+                                echo '<div style="color: #47A8BD;">'.$_SESSION['c_newCategoryExp'].'</div>';
+                                unset($_SESSION['c_newCategoryExp']);
+                            }
                             if(isset($_SESSION['e_newCategory'])) {
                                 echo '<div style="color: red; font-weight: bold">'.$_SESSION['e_newCategory'].'</div>';
                                 unset($_SESSION['e_newCategory']);
                             }
+                            if(isset($_SESSION['e_newCategoryExp'])) {
+                                echo '<div style="color: red; font-weight: bold">'.$_SESSION['e_newCategoryExp'].'</div>';
+                                unset($_SESSION['e_newCategoryExp']);
+                            }
+                            
                         ?>
 
                     <div class="col-6 offset-3 border mt-3"></div>
@@ -201,7 +237,7 @@ if(isset($_POST['newCategory'])){
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="incomes-cattegory-list">Lista kategorii
+                                    <h5 class="modal-title font-weight-bold" id="incomes-cattegory-list">Lista kategorii przychodów
                                     </h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
@@ -211,11 +247,11 @@ if(isset($_POST['newCategory'])){
                                      <?php
                                      if(isset($_SESSION['c_cat'])) {
 
-                                         for ($j = 0; $j < $i; $j++) {
+                                         for ($k = 0; $k < $i; $k++) {
 
-                                            echo $_SESSION['c_category'.$j];
+                                            echo $_SESSION['c_category'.$k];
                                             echo '<div class="col-6 offset-3 border my-2"></div>';
-                                            unset($_SESSION['c_category'.$j]);
+                                            unset($_SESSION['c_category'.$k]);
                                          }
                                           unset($_SESSION['c_cat']);
                                      }
@@ -248,7 +284,7 @@ if(isset($_POST['newCategory'])){
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title font-weight-bold" id="incomes-add-cattegory">Dodawanie
-                                            kategorii</h5>
+                                            kategorii przychodu</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -292,10 +328,10 @@ if(isset($_POST['newCategory'])){
                                                 <?php
                                                  if(isset($_SESSION['c_catDelete'])) {
 
-                                                     for ($j = 0; $j < $i; $j++) {
+                                                     for ($k = 0; $k < $i; $k++) {
 
-                                                        echo $_SESSION['c_categoryDelete'.$j];
-                                                        unset($_SESSION['c_categoryDelete'.$j]);
+                                                        echo $_SESSION['c_categoryDelete'.$k];
+                                                        unset($_SESSION['c_categoryDelete'.$k]);
                                                      }
                                                      unset($_SESSION['c_catDelete']);
                                                  }
@@ -332,7 +368,7 @@ if(isset($_POST['newCategory'])){
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="expenses-cattegory-list">Lista kategorii</h5>
+                                    <h5 class="modal-title font-weight-bold" id="expenses-cattegory-list">Lista kategorii wydatków</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -340,18 +376,18 @@ if(isset($_POST['newCategory'])){
                                 <div class="modal-body">
                                     
                                      <div class="modal-body">
-                                    //<?php
-                                     //if(isset($_SESSION['c_cat'])) {
+                                    <?php
+                                     if(isset($_SESSION['c_catExp'])) {
 
-                                       //  for ($j = 0; $j < $i; $j++) {
+                                         for ($k = 0; $k < $j; $k++) {
 
-                                         //   echo $_SESSION['c_category'.$j];
-                                           // echo '<div class="col-6 offset-3 border my-2"></div>';
-                                        //    unset($_SESSION['c_category'.$j]);
-                                        // }
-                                        //  unset($_SESSION['c_cat']);
-                                    // }
-                                    // ?>
+                                            echo $_SESSION['c_categoryExp'.$k];
+                                            echo '<div class="col-6 offset-3 border my-2"></div>';
+                                            unset($_SESSION['c_categoryExp'.$k]);
+                                         }
+                                          unset($_SESSION['c_catExp']);
+                                     }
+                                     ?>
                                 </div>
                             
                                 </div>
@@ -366,37 +402,36 @@ if(isset($_POST['newCategory'])){
                     <!--Expenses Add category-->
                     <div class="col-lg-6 offset-lg-3 p-3">
 
-                        <button type="button" class="btn btn-settings" data-toggle="modal"
-                            data-target="#modal-expenses-add-category">
-                            Dodaj kategorię
-                        </button>
+                    <button type="button" class="btn btn-settings" data-toggle="modal"
+                        data-target="#modal-expenses-add-category">
+                        Dodaj kategorię
+                    </button>
 
                     </div>
 
                     <div class="modal fade" id="modal-expenses-add-category" tabindex="-1" role="dialog"
-                        aria-labelledby="modal-expenses-add-category" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
+                    aria-labelledby="modal-expenses-add-category" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form method="post">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title font-weight-bold" id="expenses-add-cattegory">Dodawania
-                                        kategorii</h5>
+                                    <h5 class="modal-title font-weight-bold" id="expenses-add-cattegory">Dodawanie
+                                        kategorii wydatku</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                </div>
+                                </div>                                     
                                 <div class="modal-body">
-                                    <input class="d-inline-block form-control mt-3" type="text" id="expenses-add-new-category"
+                                    <input class="d-inline-block form-control mt-3" type="text" name="newCategoryExp" id="expenses-add-new-category"
                                         placeholder="Kategoria" aria-label="expenses-add-new-category"
                                         aria-describedby="expenses-add-new-category">
-                                    <button class="d-inline-block btn-sub-mini-setting ml-1">Dodaj</button>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary font-weight-bold"
-                                        data-dismiss="modal">Anuluj</button>
-                                    <button type="submit" class="btn-sub-settings font-weight-bold">Zapisz</button>
+                                    <button type="submit" class="btn btn-secondary font-weight-bold" style="background-color: #F5E683; color: black; border-color:#F5E683;">Dodaj</button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
+                    </div>
                     </div>
 
                     <!--Expenses Delate category-->

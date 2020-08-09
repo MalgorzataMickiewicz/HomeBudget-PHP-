@@ -91,6 +91,11 @@ if(isset($_POST['email'])){
                         $categoryName= $row['categoryName'];
                         mysqli_query($connection, "INSERT INTO incomescategoryassigned VALUES (NULL, '$userId', '$categoryName')");
                     }
+                $resultCategoryExp = mysqli_query($connection, "SELECT categoryName FROM expensescategory");               
+                    while ($row2 = $resultCategoryExp->fetch_assoc()) {
+                        $categoryNameExp= $row2['categoryName'];
+                        mysqli_query($connection, "INSERT INTO expensescategoryassigned VALUES (NULL, '$userId', '$categoryNameExp')");
+                    }
                     $_SESSION['registration'] = true;
                     $_SESSION['c_registration'] = "Użytkownik został prawidłowo zarejestrowany";
             }

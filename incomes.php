@@ -252,7 +252,7 @@ if(isset($_POST['kwota'])){
 
                     <div class="col-lg-5 p-1">
                         <a href="menu.php">
-                            <button type="submit" class="btn btn-register my-3"> Anuluj </button>
+                            <button type="button" class="btn btn-register my-3"> Anuluj </button>
                         </a>
                     </div>  
                 </div>

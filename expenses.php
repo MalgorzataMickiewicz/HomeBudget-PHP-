@@ -6,6 +6,96 @@ if (!isset($_SESSION['logged'])){
    header('Location: login.php');
 	exit();
     }  
+
+if (isset($_SESSION['logged'])){
+
+    require_once "connect.php"; 
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+    if($connection->connect_errno!=0){
+        echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        if ($connection){
+
+            $userId = $_SESSION['userId'];
+            $resultName = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE userId = '$userId'");
+            $i = 0;
+            while ($row = $resultName->fetch_assoc()) {
+
+                $categoryName= $row['categoryName'];
+                $_SESSION['c_category'.$i] = '<option value="'.$categoryName.'">'.$categoryName.'</option>';
+                $i += 1;          
+            }
+            $_SESSION['c_cat'] = '';
+        }
+        else{
+             throw new Exception($connection->error);        
+        }
+  }
+$connection->close();
+}  
+    
+if(isset($_POST['kwota'])){
+	//Flaga
+    $validation_OK = true;
+    
+    require_once "connect.php"; 
+
+	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+
+	if($connection->connect_errno!=0){
+		echo "Error: ".$connection->connect_errno;
+    }
+    else{
+        $kwota = $_POST['kwota'];
+
+        //walidacja kwoty
+        if($kwota != 0){
+            $kwota = str_replace(",",".",$kwota); 
+            $places = 2;
+            $mult = pow(10, $places);
+            $newKwota = ceil($kwota * $mult) / $mult;
+        }
+        else{
+            $_SESSION['e_kwota']="Wprowadź liczbę dodatnią, różną od zera!";
+            $validation_OK = false;
+        }
+
+        //walidacja kategorii
+        if(!isset($_POST['kategoria'])){
+
+            $_SESSION['e_kategoria']="Wybierz kategorię!";
+            $validation_OK = false;
+        }
+
+        if($validation_OK == true){
+            //Testy zaliczone, dodajemy wydatek do bazy
+
+            if ($connection){
+
+                $kategoria = $_POST['kategoria'];
+                $data = $_POST['data'];
+                $komentarz = $_POST['komentarz'];
+                $userId = $_SESSION['userId'];
+
+                $resultId = mysqli_query($connection, "SELECT * FROM expensescategoryassigned WHERE categoryName = '$kategoria'");
+            
+                while ($row = $resultId->fetch_assoc()) {
+                    $categoryId= $row['id'];
+                    
+                   mysqli_query($connection, "INSERT INTO expenses VALUES ('$userId', NULL, '$data', '$newKwota', '$categoryId', '$komentarz')");
+                }
+                    
+                $_SESSION['c_communicat'] = "Wydatek został prawidłowo dodany";
+            }
+            else{
+                throw new Exception($connection->error);        
+            }
+        }
+        $connection->close();
+    }
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -56,12 +146,12 @@ if (!isset($_SESSION['logged'])){
                         <div class="dropdown-menu" aria-labelledby="submenu">
 
                             <a class="dropdown-item" href="summerycurrentmonth.php"> Bieżący miesiąc </a>
-							<a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
-							
-							<div class="dropdown-divider"></div>
-							
-							<a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
-							<a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
+                            <a class="dropdown-item" href="summerypreviesmonth.php"> Poprzedni miesiąc </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item" href="summerycurrentyear.php"> Bieżący rok </a>
+                            <a class="dropdown-item" href="summeryrange.php"> Niestandardowy </a>
 
                         </div>
 
@@ -77,80 +167,99 @@ if (!isset($_SESSION['logged'])){
 
     <main>
         <div class="container">
+            <form method="post">
 
-            <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
+                <div class="row text-center bg-background my-4 p-sm-3 p-lg-0">
 
-                <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
+                    <div class="col-lg-10 offset-lg-1 my-5 bg-white bg-shadow">
 
-                    <h1 class="h2 font-weight-bold bg-color my-4">
-                        Dodaj swój wydatek
-                    </h1>
+                        <h1 class="h2 font-weight-bold bg-color my-4">
+                            Dodaj swój wydatek
+                        </h1>
 
-                </div>
+                    </div>
 
-                <div class="col-lg-5 offset-lg-1">
+                    <?php
+                        if(isset($_SESSION['c_communicat'])) {
+                            echo '<div class="col-lg-10 offset-lg-1 my-2" style="color:#47A8BD; font-weight:bold;">'.$_SESSION['c_communicat'].'</div>';
+                            unset($_SESSION['c_communicat']);
+                        }
+                    ?>
 
-                    <label class="font-weight-bold" for="kwota">Dodaj kwotę wydatku</label>
+                    <div class="col-lg-5 offset-lg-1">
 
-                    <input type="text" class="form-control" id="kwota" placeholder="Kwota" aria-label="kwota"
-                    aria-describedby="kwota">
+                        <label class="font-weight-bold" for="kwota">Dodaj kwotę wydatku</label>
 
-                </div>
+                        <input type="text" class="form-control" name="kwota" id="kwota" placeholder="Kwota"
+                            aria-label="kwota" aria-describedby="kwota">
 
-                <div class="col-lg-5">
+                        <?php
 
-                    <label class="font-weight-bold" for="data">Dodaj datę wydatku</label>
+                        if(isset($_SESSION['e_kwota'])) {
+                            echo '<div style="color: red;">'.$_SESSION['e_kwota'].'</div>';
+                            unset($_SESSION['e_kwota']);
+                        }
+                    ?>
 
-                    <input type="date" class="form-control" id="data" aria-label="data"
-                    aria-describedby="data">
+                    </div>
 
-                </div>
+                    <div class="col-lg-5">
+
+                        <label class="font-weight-bold" for="data">Dodaj datę wydatku</label>
+
+                        <input type="date" name="data" class="form-control" id="data" aria-label="data"
+                            aria-describedby="data">
+
+                    </div>
 
                     <div class="form-group col-lg-5 offset-lg-1">
 
-                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego wydatku</label>
-                        <select multiple class="form-control" id="przychod-kategoria">
-                            <option value="a"> Jedzenie </option>
-                            <option value="b"> Mieszkanie </option>
-                            <option value="c"> Transport </option>
-                            <option value="d"> Telekomunikacja </option>
-                            <option value="e"> Opieka zdrowotna </option>
-                            <option value="f"> Ubranie </option>
-                            <option value="g"> Higiena </option>
-                            <option value="h"> Dzieci </option>
-                            <option value="i"> Rozrywka </option>
-                            <option value="j"> Wycieczka </option>
-                            <option value="k"> Szkolenia </option>
-                            <option value="l"> Książki </option>
-                            <option value="m"> Oszczędności </option>
-                            <option value="n"> Emerytura </option>
-                            <option value="o"> Zpłata długów </option>
-                            <option value="p"> Darowizna </option>
-                            <option value="r"> Inne </option>
+                        <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego
+                            wydatku</label>
+                        <select name="kategoria" multiple class="form-control" id="przychod-kategoria">
+
+                            <?php
+                             if(isset($_SESSION['c_cat'])) {
+                                 
+                                 for ($j = 0; $j < $i; $j++) {
+                                     
+                                    echo $_SESSION['c_category'.$j];
+                                    unset($_SESSION['c_category'.$j]);
+                                 }
+                                 unset($_SESSION['c_cat']);
+                             }
+                            ?>
 
                         </select>
 
-                      </div>
+                        <?php
+                            if(isset($_SESSION['e_kategoria'])) {
+                                echo '<div style="color: red;">'.$_SESSION['e_kategoria'].'</div>';
+                                unset($_SESSION['e_kategoria']);
+                            }
+                        ?>
 
-                      <div class="form-group col-lg-5">
+                    </div>
+
+                    <div class="form-group col-lg-5">
 
                         <label class="font-weight-bold" for="komentarz"> Dodaj opcjonalnie swój komentarz </label>
-                        <textarea class="form-control" id="komentarz" rows="3"></textarea>
+                        <textarea name="komentarz" class="form-control" id="komentarz" rows="3"></textarea>
 
-                    </div>  
+                    </div>
 
                     <div class="col-lg-5 offset-lg-1 p-1">
                         <button type="submit" class="btn btn-register my-3"> Dodaj wydatek </button>
                     </div>
-                    
+
                     <div class="col-lg-5 p-1">
                         <a href="menu.php">
-                        <button type="submit" class="btn btn-register my-3"> Anuluj </button>
+                            <button type="button" class="btn btn-register my-3"> Anuluj </button>
                         </a>
                     </div>
 
-            </div>
-
+                </div>
+            </form>
         </div>
 
     </main>
