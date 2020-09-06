@@ -72,7 +72,7 @@ if(isset($_POST['kwota'])){
             $_SESSION['e_kategoria']="Wybierz kategorię!";
             $validation_OK = false;
         }
-
+    
         if($validation_OK == true){
             //Testy zaliczone, dodajemy wydatek do bazy
 
@@ -82,13 +82,14 @@ if(isset($_POST['kwota'])){
                 $data = $_POST['data'];
                 $komentarz = $_POST['komentarz'];
                 $userId = $_SESSION['userId'];
+                $methodPay = $_POST['metodaPlatnosci'];
 
                 $resultId = mysqli_query($connection, "SELECT * FROM expensescategoryassigned WHERE categoryName = '$kategoria' AND userId = '$userId'");
             
                 while ($row = $resultId->fetch_assoc()) {
                     $categoryId= $row['id'];
                     
-                   mysqli_query($connection, "INSERT INTO expenses VALUES ('$userId', NULL, '$data', '$newKwota', '$categoryId', '$komentarz')");
+                   mysqli_query($connection, "INSERT INTO expenses VALUES ('$userId', NULL, '$data', '$newKwota', '$methodPay','$categoryId', '$komentarz')");
                 }
                     
                 $_SESSION['c_communicat'] = "Wydatek został prawidłowo dodany";
@@ -199,11 +200,11 @@ if(isset($_POST['kwota'])){
 
                         <?php
 
-                        if(isset($_SESSION['e_kwota'])) {
-                            echo '<div style="color: red;">'.$_SESSION['e_kwota'].'</div>';
-                            unset($_SESSION['e_kwota']);
-                        }
-                    ?>
+                            if(isset($_SESSION['e_kwota'])) {
+                                echo '<div style="color: red;">'.$_SESSION['e_kwota'].'</div>';
+                                unset($_SESSION['e_kwota']);
+                            }
+                        ?>
 
                     </div>
 
@@ -217,17 +218,18 @@ if(isset($_POST['kwota'])){
                     </div>
                     
                     <div class="form-group col-lg-3 offset-lg-1">
-                        <label class="font-weight-bold" for="metoda_platnosci"> Wybierz metodę płatności </label>
+                        <label class="font-weight-bold"> Wybierz metodę płatności </label>
                             <div class="form-control method-pay">
-                                <input type="radio" style="margin-top:0px;" id="gotowka" name="drone" value="gotowka" checked>
+                                <input type="radio" id="gotowka" name="metodaPlatnosci" value="Gotówka" checked>
                                 <label for="gotowka">Gotówka</label>
                                 <br />
-                                <input type="radio" style="margin-top:0px;" id="debetowa" name="drone" value="debetowa">
+                                <input type="radio" id="debetowa" name="metodaPlatnosci" value="Karta debetowa">
                                 <label for="debetowa">Karta debetowa</label>
                                 <br />
-                                <input type="radio" style="margin-top:0px;" id="kredytowa" name="drone" value="kredytowa">
+                                <input type="radio" id="kredytowa" name="metodaPlatnosci" value="Karta kredytowa">
                                 <label for="kredytowa">Karta kredytowa</label>  
                             </div>    
+                        </label>
                     </div>
 
                     <div class="form-group col-lg-4">
