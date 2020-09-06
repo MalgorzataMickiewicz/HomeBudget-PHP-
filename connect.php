@@ -1,8 +1,7 @@
 <?php
  
     $host = "localhost";
-    $db_user = "root";
-    $db_password = "";
-    $db_name = "home_budget";
- 
+    $db_user = "malgorz6_margotmickiewicz";
+    $db_password = "Jackstapleton1";
+    $db_name = "malgorz6_home_budget";
 ?>

@@ -3,7 +3,7 @@
 session_start();
 
 if (!isset($_SESSION['logged'])){
-   header('Location: login.php');
+   header('Location: index.php');
 	exit();
     }  
 
@@ -11,6 +11,8 @@ if (isset($_SESSION['logged'])){
 
     require_once "connect.php"; 
     $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    mysqli_query($connection, "SET CHARSET utf8");
+    mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
     if($connection->connect_errno!=0){
         echo "Error: ".$connection->connect_errno;
@@ -38,7 +40,7 @@ if (isset($_SESSION['logged'])){
                 $categoryIncomeId = $row['categoryIncomeId'];
                 $idIncome = $row['idIncome'];
                 
-                $resultName = mysqli_query($connection, "SELECT categoryName FROM incomescategoryassigned WHERE id = '$categoryIncomeId'");
+                $resultName = mysqli_query($connection, "SELECT categoryName FROM incomescategoryassigned WHERE id = '$categoryIncomeId' AND userId = '$userId'");
                 
                  while ($row = $resultName->fetch_assoc()) {
                      $categoryName = $row['categoryName'];
@@ -111,7 +113,7 @@ if (isset($_SESSION['logged'])){
                 $categoryExpenseId = $row1['categoryExpenseId'];
                 $idExpense = $row1['idExpense'];
 
-                $resultNameExp = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE id = '$categoryExpenseId'");
+                $resultNameExp = mysqli_query($connection, "SELECT categoryName FROM expensescategoryassigned WHERE id = '$categoryExpenseId' AND userId = '$userId'");
             
                 while ($row1 = $resultNameExp->fetch_assoc()) {
                      $categoryNameExp = $row1['categoryName'];

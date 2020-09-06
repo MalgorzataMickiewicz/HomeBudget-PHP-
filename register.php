@@ -13,7 +13,9 @@ if(isset($_POST['email'])){
     
     require_once "connect.php"; 
 
-	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    mysqli_query($connection, "SET CHARSET utf8");
+    mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
 	if($connection->connect_errno!=0){
 		echo "Error: ".$connection->connect_errno;
@@ -37,7 +39,7 @@ if(isset($_POST['email'])){
 			$user_number_email = $resultat->num_rows;
 			if($user_number_email > 0){
 				$validation_OK = false;
-				$_SESSION['e_email']="Istnieje już konto przypisane do tego adresu e-mail!";
+				$_SESSION['e_email'] = "Istnieje już konto przypisane do tego adresu e-mail!";
             }		
             
         $login = $_POST['login'];
@@ -244,7 +246,7 @@ if(isset($_POST['email'])){
 
                 <div class="col-lg-4 bg-white my-4 offset-lg-2 offset-xs-0 shadow p-3">
                     <h1 class="h3 font-weight-bold my-4">Masz już konto? <br />Zaloguj się!</h1>
-                    <a href="login.php">
+                    <a href="index.php">
                         <button type="submit" class="btn-login my-3 mb-3">Logowanie </button>
                     </a>
                     <p class="h4 font-weight-bold mb-2 mt-2">  </p>

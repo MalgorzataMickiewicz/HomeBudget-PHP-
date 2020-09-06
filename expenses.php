@@ -3,7 +3,7 @@
 session_start();
 
 if (!isset($_SESSION['logged'])){
-   header('Location: login.php');
+   header('Location: index.php');
 	exit();
     }  
 
@@ -11,6 +11,8 @@ if (isset($_SESSION['logged'])){
 
     require_once "connect.php"; 
     $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    mysqli_query($connection, "SET CHARSET utf8");
+    mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
     if($connection->connect_errno!=0){
         echo "Error: ".$connection->connect_errno;
@@ -42,7 +44,9 @@ if(isset($_POST['kwota'])){
     
     require_once "connect.php"; 
 
-	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    mysqli_query($connection, "SET CHARSET utf8");
+    mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
 	if($connection->connect_errno!=0){
 		echo "Error: ".$connection->connect_errno;
@@ -79,7 +83,7 @@ if(isset($_POST['kwota'])){
                 $komentarz = $_POST['komentarz'];
                 $userId = $_SESSION['userId'];
 
-                $resultId = mysqli_query($connection, "SELECT * FROM expensescategoryassigned WHERE categoryName = '$kategoria'");
+                $resultId = mysqli_query($connection, "SELECT * FROM expensescategoryassigned WHERE categoryName = '$kategoria' AND userId = '$userId'");
             
                 while ($row = $resultId->fetch_assoc()) {
                     $categoryId= $row['id'];

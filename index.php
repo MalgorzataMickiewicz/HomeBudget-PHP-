@@ -13,7 +13,9 @@ if(isset($_POST['login'])){
 
     require_once "connect.php"; 
 
-	$connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    $connection = @new mysqli($host, $db_user, $db_password, $db_name);
+    mysqli_query($connection, "SET CHARSET utf8");
+    mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
 	if($connection->connect_errno!=0){
 		echo "Error: ".$connection->connect_errno;
@@ -154,10 +156,15 @@ if(isset($_POST['login'])){
 
                 </div>
             </div>
-
         </div>
 
     </main>
+
+    <footer>    
+        <div class="footer" style="background-color: #343a40; color: white; text-align: center; font-size: 16px; padding: 5px;">
+         © Małgorzata Mickiewicz
+        </div>
+    </footer>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
