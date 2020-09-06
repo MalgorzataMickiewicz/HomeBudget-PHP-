@@ -14,7 +14,7 @@ if (isset($_SESSION['logged'])){
     mysqli_query($connection, "SET CHARSET utf8");
     mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
-    if($connection->connect_errno!=0){
+    if($connection->connect_errno != 0){
         echo "Error: ".$connection->connect_errno;
     }
     else{
@@ -48,7 +48,7 @@ if(isset($_POST['kwota'])){
     mysqli_query($connection, "SET CHARSET utf8");
     mysqli_query($connection, "SET NAMES 'utf8' COLLATE 'utf8_polish_ci'");
 
-	if($connection->connect_errno!=0){
+	if($connection->connect_errno != 0){
 		echo "Error: ".$connection->connect_errno;
     }
     else{
@@ -215,8 +215,22 @@ if(isset($_POST['kwota'])){
                             aria-describedby="data">
 
                     </div>
+                    
+                    <div class="form-group col-lg-3 offset-lg-1">
+                        <label class="font-weight-bold" for="metoda_platnosci"> Wybierz metodę płatności </label>
+                            <div class="form-control method-pay">
+                                <input type="radio" style="margin-top:0px;" id="gotowka" name="drone" value="gotowka" checked>
+                                <label for="gotowka">Gotówka</label>
+                                <br />
+                                <input type="radio" style="margin-top:0px;" id="debetowa" name="drone" value="debetowa">
+                                <label for="debetowa">Karta debetowa</label>
+                                <br />
+                                <input type="radio" style="margin-top:0px;" id="kredytowa" name="drone" value="kredytowa">
+                                <label for="kredytowa">Karta kredytowa</label>  
+                            </div>    
+                    </div>
 
-                    <div class="form-group col-lg-5 offset-lg-1">
+                    <div class="form-group col-lg-4">
 
                         <label class="font-weight-bold" for="przychod-kategoria">Wybierz kategorie dodawanego
                             wydatku</label>
@@ -245,7 +259,7 @@ if(isset($_POST['kwota'])){
 
                     </div>
 
-                    <div class="form-group col-lg-5">
+                    <div class="form-group col-lg-3">
 
                         <label class="font-weight-bold" for="komentarz"> Dodaj opcjonalnie swój komentarz </label>
                         <textarea name="komentarz" class="form-control" id="komentarz" rows="3"></textarea>

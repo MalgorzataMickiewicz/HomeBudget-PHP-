@@ -223,6 +223,15 @@ label {
     color: white;
 }
 
+.method-pay {
+    height:58%;
+}
+
+.method-pay label{
+    height:30px; 
+    margin-top:0px;
+}
+
 @media screen and (max-width:1200px) {
 
 .btn-register {
