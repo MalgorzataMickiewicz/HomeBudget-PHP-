@@ -160,9 +160,9 @@ if(isset($_POST['login'])){
 
     </main>
 
-    <footer>    
-        <div class="footer" style="background-color: #343a40; color: white; text-align: center; font-size: 16px; padding: 5px;">
-         © Małgorzata Mickiewicz
+    <footer class="fixed-bottom">    
+        <div class="footer">
+         © Małgorzata Mickiewicz <a href="malgorzatamickiewicz.pl/kontakt">contact with me</a>
         </div>
     </footer>
 
